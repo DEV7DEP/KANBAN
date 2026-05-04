@@ -10,18 +10,20 @@
     <style>
         body { 
             font-family: 'Segoe UI', system-ui, sans-serif; 
-            background: linear-gradient(to bottom, #ffffff, #111111);
+            background: linear-gradient(to bottom, #ffffff, #0a0a0a);
             min-height: 100vh;
         }
         .input-box {
-            background-color: rgba(16, 185, 129, 0.12); 
+            background: linear-gradient(135deg, #10b981, #ffffff); /* Vert dégradé vers blanc */
             border: 2px solid #10b981;
         }
         .simulation-box {
-            background-color: rgba(239, 68, 68, 0.15); /* Rouge avec opacité */
-            border: 2px solid #ef4444;
+            background-color: rgba(234, 179, 8, 0.25); /* Jaune avec opacité */
+            border: 2px solid #eab308;
         }
-        /* Supprimer les flèches des inputs number */
+        .result-box {
+            background: linear-gradient(135deg, #1e40af, #3b82f6);
+        }
         input[type="number"] {
             -moz-appearance: textfield;
             appearance: textfield;
@@ -31,37 +33,46 @@
             -webkit-appearance: none;
             margin: 0;
         }
-        #stockChart { 
-            height: 180px !important; 
-        }
+        #stockChart { height: 180px !important; }
     </style>
 </head>
 <body class="p-6">
     <div class="max-w-5xl mx-auto">
-        <h1 class="text-4xl font-bold text-center mb-8 text-blue-600">🧪 SIMULATION D'UN ARTICLE</h1>
+        <h1 class="text-4xl font-bold text-center mb-10 text-blue-700">🧪 SIMULATION D'UN ARTICLE</h1>
 
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            <!-- === ZONE SAISIE (Vert) === -->
-            <div class="input-box p-8 rounded-3xl shadow-sm">
-                <h2 class="text-2xl font-semibold mb-6 text-emerald-700">📥 Données d'entrée</h2>
+            <!-- === ZONE SAISIE (Vert dégradé vers blanc) === -->
+            <div class="input-box p-8 rounded-3xl shadow-xl">
+                <h2 class="text-2xl font-semibold mb-6 text-emerald-800">📥 Données d'entrée</h2>
                 
                 <div class="space-y-5">
                     <div class="grid grid-cols-2 gap-4">
                         <div>
                             <label class="block text-gray-700 mb-1 font-medium">UDI</label>
                             <input id="udi" type="number" step="0.01" 
-                                   class="w-full bg-white border border-gray-300 rounded-2xl px-5 py-4 focus:border-emerald-500 outline-none text-lg">
+                                   class="w-full bg-white border border-gray-400 rounded-2xl px-5 py-4 focus:border-emerald-600 outline-none text-lg">
                         </div>
                         <div>
                             <label class="block text-gray-700 mb-1 font-medium">Délai réappro (jours)</label>
                             <input id="delai" type="number" 
-                                   class="w-full bg-white border border-gray-300 rounded-2xl px-5 py-4 focus:border-emerald-500 outline-none text-lg">
+                                   class="w-full bg-white border border-gray-400 rounded-2xl px-5 py-4 focus:border-emerald-600 outline-none text-lg">
                         </div>
                     </div>
-                    <div>
-                        <label class="block text-gray-700 mb-1 font-medium">Consommation KE / jour</label>
-                        <input id="ke_jour" type="number" step="0.01" 
-                               class="w-full bg-white border border-gray-300 rounded-2xl px-5 py-4 focus:border-emerald-500 outline-none text-lg">
+
+                    <!-- KE / jour et KE / mois -->
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-gray-700 mb-1 font-medium">KE / jour</label>
+                            <input id="ke_jour" type="number" step="0.01" 
+                                   class="w-full bg-white border border-gray-400 rounded-2xl px-5 py-4 focus:border-emerald-600 outline-none text-lg"
+                                   oninput="syncKE(this)">
+                        </div>
+                        <div>
+                            <label class="block text-gray-700 mb-1 font-medium">KE / mois</label>
+                            <input id="ke_mois" type="number" step="0.01" 
+                                   class="w-full bg-white border border-gray-400 rounded-2xl px-5 py-4 focus:border-emerald-600 outline-none text-lg"
+                                   oninput="syncKE(this)">
+                        </div>
                     </div>
                 </div>
 
@@ -72,8 +83,7 @@
             </div>
 
             <!-- === RÉSULTATS === -->
-            <div class="result-box p-8 rounded-3xl text-white shadow-md" 
-                 style="background: linear-gradient(135deg, #1e40af, #3b82f6);">
+            <div class="result-box p-8 rounded-3xl text-white shadow-xl">
                 <h2 class="text-2xl font-semibold mb-6">📊 Résultats Simulation KE</h2>
                 
                 <div class="grid grid-cols-2 gap-6 text-lg">
@@ -102,14 +112,14 @@
             </div>
         </div>
 
-        <!-- === SIMULATION SUR 250 JOURS (Rouge opacité) === -->
-        <div class="mt-10 simulation-box p-8 rounded-3xl shadow-sm">
-            <h2 class="text-xl font-semibold mb-4 text-red-700">📋 Simulation détaillée sur 250 jours</h2>
-            <div id="simulation_text" class="font-mono text-sm bg-white p-6 rounded-2xl max-h-80 overflow-auto leading-relaxed text-gray-700"></div>
+        <!-- === SIMULATION SUR 250 JOURS (JAUNE) === -->
+        <div class="mt-10 simulation-box p-8 rounded-3xl shadow-xl">
+            <h2 class="text-xl font-semibold mb-4 text-yellow-800">📋 Simulation détaillée sur 250 jours</h2>
+            <div id="simulation_text" class="font-mono text-sm bg-white p-6 rounded-2xl max-h-80 overflow-auto leading-relaxed text-gray-800"></div>
         </div>
 
-        <!-- === COURBE DE STOCK === -->
-        <div class="mt-10 bg-white border border-gray-300 p-6 rounded-3xl shadow-sm">
+        <!-- === COURBE === -->
+        <div class="mt-10 bg-white border border-gray-300 p-6 rounded-3xl shadow-xl">
             <h2 class="text-xl font-semibold mb-4 text-gray-700">📈 Courbe d'évolution du stock</h2>
             <canvas id="stockChart" class="w-full"></canvas>
         </div>
@@ -122,13 +132,23 @@
     <script>
         let stockChart = null;
 
+        // Synchronisation KE/jour ↔ KE/mois
+        function syncKE(input) {
+            const keJour = document.getElementById('ke_jour');
+            const keMois = document.getElementById('ke_mois');
+
+            if (input.id === 'ke_jour') {
+                keMois.value = keJour.value ? (parseFloat(keJour.value) * 22).toFixed(2) : '';
+            } else {
+                keJour.value = keMois.value ? (parseFloat(keMois.value) / 22).toFixed(2) : '';
+            }
+        }
+
         function simulerConsommation(udi, consoParJour, delai) {
             const minInterval = 22;
             let cibleJours = Math.max(0, Math.floor(delai) + 3);
 
-            if (consoParJour < 0.5 && udi === 1) {
-                return { E: 2, e: 1, Coef: 2, Intervalle: "--", Commentaire: "Consommation faible" };
-            }
+            if (consoParJour < 0.5 && udi === 1) return { E: 2, e: 1, Coef: 2, Intervalle: "--", Commentaire: "Consommation faible" };
             if (consoParJour <= 0 || consoParJour < 0.5) {
                 let E = udi > 0 ? udi : 10;
                 let e = E < 10 ? 1 : Math.ceil(0.4 * E);
@@ -152,16 +172,9 @@
 
             coef = udi > 0 ? Math.ceil(E / udi) : 1;
             E = coef * udi;
-
             const intervalle = Math.round(E / consoParJour);
 
-            return {
-                E: Math.round(E),
-                e: Math.round(e),
-                Coef: coef,
-                Intervalle: intervalle,
-                Commentaire: ""
-            };
+            return { E: Math.round(E), e: Math.round(e), Coef: coef, Intervalle: intervalle, Commentaire: "" };
         }
 
         function genererSimulationText(E, conso, commentaire) {
@@ -185,9 +198,7 @@
             if (stockChart) stockChart.destroy();
 
             let stock = E;
-            const jours = [];
-            const stocks = [];
-
+            const jours = [], stocks = [];
             for (let j = 1; j <= 250; j++) {
                 if (stock - consoParJour < consoParJour) stock += E;
                 stock -= consoParJour;
@@ -197,16 +208,16 @@
 
             stockChart = new Chart(ctx, {
                 type: 'line',
-                data: {
-                    labels: jours,
-                    datasets: [{
-                        label: 'Stock',
-                        data: stocks,
-                        borderColor: '#e11d48',
-                        borderWidth: 3,
-                        tension: 0.4,
-                        pointRadius: 0
-                    }]
+                data: { 
+                    labels: jours, 
+                    datasets: [{ 
+                        label: 'Stock', 
+                        data: stocks, 
+                        borderColor: '#e11d48', 
+                        borderWidth: 3, 
+                        tension: 0.4, 
+                        pointRadius: 0 
+                    }] 
                 },
                 options: {
                     responsive: true,
@@ -221,12 +232,12 @@
         }
 
         function lancerSimulation() {
+            let keJour = parseFloat(document.getElementById('ke_jour').value) || 0;
             const udi = parseFloat(document.getElementById('udi').value) || 0;
             const delai = parseFloat(document.getElementById('delai').value) || 0;
-            const keJour = parseFloat(document.getElementById('ke_jour').value) || 0;
 
             if (udi <= 0 || keJour <= 0) {
-                alert("Veuillez remplir UDI et KE / jour");
+                alert("Veuillez remplir UDI et au moins un des deux champs KE");
                 return;
             }
 
@@ -243,7 +254,6 @@
             dessinerCourbe(res.E, keJour);
         }
 
-        // Champs vides au démarrage
         window.onload = () => {};
     </script>
 </body>
