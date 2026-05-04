@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kanban - Simulation Article</title>
+    <title>SIMULATION D'UN SYMBOLE CHARIOT</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
@@ -14,11 +14,11 @@
             min-height: 100vh;
         }
         .input-box {
-            background: linear-gradient(135deg, #10b981, #ffffff); /* Vert dégradé vers blanc */
+            background: linear-gradient(135deg, #10b981, #ffffff);
             border: 2px solid #10b981;
         }
         .simulation-box {
-            background-color: rgba(234, 179, 8, 0.25); /* Jaune avec opacité */
+            background-color: rgba(234, 179, 8, 0.25);
             border: 2px solid #eab308;
         }
         .result-box {
@@ -38,7 +38,10 @@
 </head>
 <body class="p-6">
     <div class="max-w-5xl mx-auto">
-        <h1 class="text-4xl font-bold text-center mb-10 text-blue-700">🧪 SIMULATION D'UN ARTICLE</h1>
+        <!-- NOUVEAU TITRE -->
+        <h1 class="text-4xl font-bold text-center mb-10 text-blue-700">
+            🧮 SIMULATION D'UN SYMBOLE CHARIOT ::
+        </h1>
 
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
             <!-- === ZONE SAISIE (Vert dégradé vers blanc) === -->
@@ -59,7 +62,6 @@
                         </div>
                     </div>
 
-                    <!-- KE / jour et KE / mois -->
                     <div class="grid grid-cols-2 gap-4">
                         <div>
                             <label class="block text-gray-700 mb-1 font-medium">KE / jour</label>
@@ -132,7 +134,6 @@
     <script>
         let stockChart = null;
 
-        // Synchronisation KE/jour ↔ KE/mois
         function syncKE(input) {
             const keJour = document.getElementById('ke_jour');
             const keMois = document.getElementById('ke_mois');
