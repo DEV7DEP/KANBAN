@@ -3,108 +3,110 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kanban - Calculateur SNCF TI Vénissieux</title>
+    <title>Kanban - Simulation Article</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
     <style>
         body { font-family: 'Segoe UI', system-ui, sans-serif; }
-        .result-card { background: linear-gradient(135deg, #1e3a8a, #3b82f6); }
+        .result-box { background: linear-gradient(135deg, #1e40af, #3b82f6); }
     </style>
 </head>
-<body class="bg-zinc-950 text-white min-h-screen">
-    <div class="max-w-5xl mx-auto p-6">
-        <h1 class="text-4xl font-bold text-center mb-2 text-blue-400">
-            🧮 Calculateur Kanban - TI Vénissieux
-        </h1>
-        <p class="text-center text-zinc-400 mb-10">Simulation KE selon la logique du logiciel interne</p>
+<body class="bg-zinc-950 text-white min-h-screen p-6">
+    <div class="max-w-6xl mx-auto">
+        <h1 class="text-4xl font-bold text-center mb-2 text-blue-400">🧪 SIMULATION D'UN ARTICLE</h1>
+        <p class="text-center text-zinc-400 mb-10">Reproduction fidèle de l'onglet "Simulation d'un Article" du logiciel TI Vénissieux</p>
 
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            <!-- INPUTS -->
+            <!-- === ZONE SAISIE === -->
             <div class="bg-zinc-900 p-8 rounded-3xl border border-zinc-700">
-                <h2 class="text-2xl font-semibold mb-6 text-emerald-400 flex items-center gap-2">
-                    <i class="fas fa-input"></i> Données d'entrée
-                </h2>
-
-                <div class="space-y-6">
+                <h2 class="text-2xl font-semibold mb-6 text-emerald-400">📥 Données d'entrée</h2>
+                
+                <div class="space-y-5">
                     <div>
-                        <label class="block text-sm text-zinc-400 mb-2">Code Article</label>
-                        <input id="code" type="text" maxlength="8" 
-                               class="w-full bg-zinc-800 border border-zinc-700 rounded-2xl px-5 py-4 text-lg focus:border-blue-500 outline-none">
+                        <label class="block text-zinc-400 mb-1">Code Article</label>
+                        <input id="code" type="text" maxlength="8" class="w-full bg-zinc-800 border border-zinc-700 rounded-2xl px-5 py-4 focus:border-blue-500 outline-none">
                     </div>
-
                     <div>
-                        <label class="block text-sm text-zinc-400 mb-2">UDI (Utilisation Journalière)</label>
-                        <input id="udi" type="number" step="0.01" value="150"
-                               class="w-full bg-zinc-800 border border-zinc-700 rounded-2xl px-5 py-4 text-lg focus:border-blue-500 outline-none">
+                        <label class="block text-zinc-400 mb-1">Désignation</label>
+                        <input id="design" type="text" class="w-full bg-zinc-800 border border-zinc-700 rounded-2xl px-5 py-4 focus:border-blue-500 outline-none">
                     </div>
-
-                    <div>
-                        <label class="block text-sm text-zinc-400 mb-2">Délai de réapprovisionnement (jours)</label>
-                        <input id="delai" type="number" step="1" value="5"
-                               class="w-full bg-zinc-800 border border-zinc-700 rounded-2xl px-5 py-4 text-lg focus:border-blue-500 outline-none">
-                    </div>
-
                     <div class="grid grid-cols-2 gap-4">
                         <div>
-                            <label class="block text-sm text-zinc-400 mb-2">KE / jour</label>
-                            <input id="ke_jour" type="number" step="0.01" value="1200"
-                                   class="w-full bg-zinc-800 border border-zinc-700 rounded-2xl px-5 py-4 text-lg focus:border-blue-500 outline-none">
+                            <label class="block text-zinc-400 mb-1">UDI</label>
+                            <input id="udi" type="number" step="0.01" value="150" class="w-full bg-zinc-800 border border-zinc-700 rounded-2xl px-5 py-4 focus:border-blue-500 outline-none">
                         </div>
                         <div>
-                            <label class="block text-sm text-zinc-400 mb-2">KE / mois</label>
-                            <input id="ke_mois" type="number" step="0.01"
-                                   class="w-full bg-zinc-800 border border-zinc-700 rounded-2xl px-5 py-4 text-lg focus:border-blue-500 outline-none"
-                                   placeholder="ou remplir ici">
+                            <label class="block text-zinc-400 mb-1">Délai réappro (jours)</label>
+                            <input id="delai" type="number" value="5" class="w-full bg-zinc-800 border border-zinc-700 rounded-2xl px-5 py-4 focus:border-blue-500 outline-none">
                         </div>
+                    </div>
+                    <div>
+                        <label class="block text-zinc-400 mb-1">Consommation KE / jour</label>
+                        <input id="ke_jour" type="number" step="0.01" value="1200" class="w-full bg-zinc-800 border border-zinc-700 rounded-2xl px-5 py-4 focus:border-blue-500 outline-none">
                     </div>
                 </div>
 
-                <button onclick="calculerKanban()" 
-                        class="mt-10 w-full bg-emerald-600 hover:bg-emerald-500 py-5 rounded-2xl text-xl font-bold transition">
-                    CALCULER SELON LOGIQUE INTERNE
+                <button onclick="lancerSimulation()" 
+                        class="mt-8 w-full bg-emerald-600 hover:bg-emerald-500 py-5 rounded-2xl text-xl font-bold transition-all">
+                    🚀 LANCER LA SIMULATION
                 </button>
             </div>
 
-            <!-- RÉSULTATS -->
-            <div class="result-card p-8 rounded-3xl text-white">
-                <h2 class="text-2xl font-semibold mb-6">📤 Résultats</h2>
+            <!-- === RÉSULTATS === -->
+            <div class="result-box p-8 rounded-3xl text-white">
+                <h2 class="text-2xl font-semibold mb-6">📊 Résultats Simulation KE</h2>
                 
-                <div class="space-y-5 text-lg">
-                    <div class="flex justify-between"><span>E (Quantité Économique KE)</span><span id="E" class="font-mono text-3xl font-bold">—</span></div>
-                    <div class="flex justify-between"><span>e (Stock de sécurité)</span><span id="e" class="font-mono text-3xl font-bold">—</span></div>
-                    <div class="flex justify-between"><span>Coef</span><span id="coef" class="font-mono text-2xl">—</span></div>
-                    <div class="flex justify-between"><span>Intervalle entre livraisons</span><span id="intervalle" class="font-mono text-2xl">— jours</span></div>
+                <div class="grid grid-cols-2 gap-6 text-lg">
+                    <div>
+                        <p class="text-white/70">E (KE)</p>
+                        <p id="E" class="text-4xl font-bold">—</p>
+                    </div>
+                    <div>
+                        <p class="text-white/70">e (KE)</p>
+                        <p id="e" class="text-4xl font-bold">—</p>
+                    </div>
+                    <div>
+                        <p class="text-white/70">Coef</p>
+                        <p id="coef" class="text-3xl font-bold">—</p>
+                    </div>
+                    <div>
+                        <p class="text-white/70">Intervalle (jours)</p>
+                        <p id="intervalle" class="text-3xl font-bold">—</p>
+                    </div>
                 </div>
 
-                <div class="mt-8 pt-6 border-t border-white/20">
-                    <p class="text-sm text-white/70 mb-2">💬 Commentaire</p>
-                    <div id="commentaire" class="bg-white/10 p-5 rounded-2xl min-h-[80px] text-sm"></div>
+                <div class="mt-8">
+                    <p class="text-white/70 mb-2">Commentaire</p>
+                    <div id="commentaire" class="bg-white/10 p-5 rounded-2xl min-h-[70px] text-sm"></div>
                 </div>
             </div>
         </div>
 
-        <!-- SIMULATION 250 JOURS -->
-        <div class="mt-12 bg-zinc-900 p-8 rounded-3xl border border-zinc-700">
-            <h2 class="text-xl font-semibold mb-4">📊 Simulation sur 250 jours</h2>
-            <div id="simulation" class="font-mono text-sm bg-black/50 p-6 rounded-2xl max-h-96 overflow-auto leading-relaxed text-emerald-300"></div>
+        <!-- === SIMULATION SUR 250 JOURS === -->
+        <div class="mt-10 bg-zinc-900 p-8 rounded-3xl border border-zinc-700">
+            <h2 class="text-xl font-semibold mb-4">📋 Simulation détaillée sur 250 jours</h2>
+            <div id="simulation_text" class="font-mono text-sm bg-black/60 p-6 rounded-2xl max-h-80 overflow-auto leading-relaxed text-emerald-300"></div>
+        </div>
+
+        <!-- === COURBE DE STOCK === -->
+        <div class="mt-10 bg-zinc-900 p-8 rounded-3xl border border-zinc-700">
+            <h2 class="text-xl font-semibold mb-4">📈 Courbe d'évolution du stock (KE) sur 250 jours</h2>
+            <canvas id="stockChart" class="w-full h-96"></canvas>
         </div>
 
         <div class="text-center text-zinc-500 text-xs mt-12">
-            Calculateur inspiré du logiciel TI Vénissieux • Version Web
+            Simulation fidèle à l'application Tkinter TI Vénissieux
         </div>
     </div>
 
     <script>
-        function toFloat(v) {
-            if (!v) return 0;
-            return parseFloat(String(v).replace(',', '.'));
-        }
+        let stockChart = null;
 
         function simulerConsommation(udi, consoParJour, delai) {
             const minInterval = 22;
             let cibleJours = Math.max(0, Math.floor(delai) + 3);
 
-            // CAS PARTICULIERS
             if (consoParJour < 0.5 && udi === 1) {
                 return { E: 2, e: 1, Coef: 2, Intervalle: "--", Commentaire: "Consommation faible" };
             }
@@ -117,78 +119,98 @@
                 return { E: Math.round(E), e: Math.round(e), Coef: coef, Intervalle: "--", Commentaire: "Consommation faible" };
             }
 
-            // CALCUL PRINCIPAL
             let udiEff = udi > 0 ? udi : 1;
             let coef = Math.max(1, Math.ceil((minInterval * consoParJour) / udiEff));
-
             let E = coef * udiEff;
             let e = Math.ceil(0.4 * E);
 
-            // Ajustement selon délai
-            while (e / consoParJour < cibleJours) {
-                e += 10;
-            }
+            while (e / consoParJour < cibleJours) e += 10;
+            while (e >= E) { coef++; E = coef * udiEff; }
 
-            // Correction e >= E
-            while (e >= E) {
-                coef += 1;
-                E = coef * udiEff;
-            }
-
-            // Arrondis
             if (E > 10) E = Math.ceil(E / 10) * 10;
             if (e > 10) e = Math.ceil(e / 10) * 10;
-
-            // Protection finale
-            if (e >= E) {
-                E += 10;
-                if (E > 10 && E % 10 !== 0) E = Math.ceil(E / 10) * 10;
-            }
+            if (e >= E) E += 10;
 
             coef = udi > 0 ? Math.ceil(E / udi) : 1;
             E = coef * udi;
 
-            const intervalle = E / consoParJour;
-            const intervalleAff = intervalle > 0 ? Math.round(intervalle).toString() : "--";
+            const intervalle = Math.round(E / consoParJour);
 
             return {
                 E: Math.round(E),
                 e: Math.round(e),
                 Coef: coef,
-                Intervalle: intervalleAff,
+                Intervalle: intervalle,
                 Commentaire: ""
             };
         }
 
-        function genererSimulation(E, consoParJour, commentaire) {
+        function genererSimulationText(E, conso, commentaire) {
             if (commentaire.includes("faible")) return "Consommation faible → pas de réappro pendant 250 jours";
-            if (consoParJour <= 0) return "Consommation inconnue – simulation impossible";
-
             let stock = E;
-            let lignes = [];
-
-            for (let jour = 1; jour <= 250; jour++) {
-                if (stock - consoParJour < consoParJour) {
+            let html = "";
+            for (let j = 1; j <= 250; j++) {
+                if (stock - conso < conso) {
                     stock += E;
-                    lignes.push(`Jour ${jour} → <span class="text-amber-400">Commande</span> | Stock = ${Math.round(stock)}`);
+                    html += `<span class="text-amber-400">Jour ${j} → COMMANDE</span> | Stock = ${Math.round(stock)}<br>`;
                 } else {
-                    stock -= consoParJour;
-                    lignes.push(`Jour ${jour} → Stock = ${Math.round(stock)}`);
+                    stock -= conso;
+                    html += `Jour ${j} → Stock = ${Math.round(stock)}<br>`;
                 }
             }
-            return lignes.join("<br>");
+            return html;
         }
 
-        function calculerKanban() {
-            const udi = toFloat(document.getElementById('udi').value);
-            let keJour = toFloat(document.getElementById('ke_jour').value);
-            const keMois = toFloat(document.getElementById('ke_mois').value);
-            const delai = toFloat(document.getElementById('delai').value);
+        function dessinerCourbe(E, consoParJour) {
+            const ctx = document.getElementById('stockChart');
+            if (stockChart) stockChart.destroy();
 
-            if (keMois > 0 && keJour === 0) keJour = keMois / 22;
+            let stock = E;
+            const jours = [];
+            const stocks = [];
 
-            if (udi <= 0 || delai <= 0 || keJour <= 0) {
-                alert("Veuillez remplir UDI, Délai et au moins un KE (jour ou mois)");
+            for (let j = 1; j <= 250; j++) {
+                if (stock - consoParJour < consoParJour) stock += E;
+                stock -= consoParJour;
+                jours.push(j);
+                stocks.push(Math.round(stock));
+            }
+
+            stockChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: jours,
+                    datasets: [{
+                        label: 'Niveau de stock',
+                        data: stocks,
+                        borderColor: '#f43f5e',
+                        borderWidth: 3,
+                        tension: 0.3,
+                        pointRadius: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: { mode: 'index', intersect: false }
+                    },
+                    scales: {
+                        y: { beginAtZero: true, grid: { color: '#334155' } },
+                        x: { grid: { color: '#334155' } }
+                    }
+                }
+            });
+        }
+
+        function lancerSimulation() {
+            const udi = parseFloat(document.getElementById('udi').value) || 0;
+            const delai = parseFloat(document.getElementById('delai').value) || 0;
+            const keJour = parseFloat(document.getElementById('ke_jour').value) || 0;
+
+            if (udi <= 0 || keJour <= 0) {
+                alert("Veuillez remplir UDI et KE / jour");
                 return;
             }
 
@@ -199,16 +221,17 @@
             document.getElementById('e').textContent = res.e;
             document.getElementById('coef').textContent = res.Coef;
             document.getElementById('intervalle').textContent = res.Intervalle + " jours";
-            document.getElementById('commentaire').innerHTML = res.Commentaire || 
-                `Commande de ${res.E} pièces tous les ${res.Intervalle} jours (coef ${res.Coef})`;
+            document.getElementById('commentaire').textContent = res.Commentaire || `Commande économique de ${res.E} unités (coef ${res.Coef})`;
 
-            // Simulation
-            const simHTML = genererSimulation(res.E, keJour, res.Commentaire || "");
-            document.getElementById('simulation').innerHTML = simHTML;
+            // Simulation texte
+            document.getElementById('simulation_text').innerHTML = genererSimulationText(res.E, keJour, res.Commentaire);
+
+            // Courbe
+            dessinerCourbe(res.E, keJour);
         }
 
-        // Calcul automatique en appuyant sur Entrée
-        document.addEventListener('keypress', e => { if (e.key === 'Enter') calculerKanban(); });
+        // Lancer automatiquement avec des valeurs par défaut
+        window.onload = () => lancerSimulation();
     </script>
 </body>
 </html>
