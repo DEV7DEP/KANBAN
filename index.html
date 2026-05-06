@@ -24,7 +24,6 @@
         .result-box {
             background: linear-gradient(135deg, #1e40af, #3b82f6);
         }
-        /* Incrémentation par 1 avec la souris */
         input[type="number"] {
             -moz-appearance: textfield;
         }
@@ -33,7 +32,6 @@
             -webkit-appearance: none;
             margin: 0;
         }
-        /* Taille fixe de la courbe */
         #stockChartContainer {
             height: 220px;
         }
@@ -41,6 +39,7 @@
 </head>
 <body class="p-6">
     <div class="max-w-5xl mx-auto">
+        <!-- HEADER -->
         <div class="flex justify-between items-center mb-8">
             <button onclick="showInfo()" 
                     class="flex items-center gap-2 bg-white hover:bg-gray-100 text-gray-700 px-5 py-3 rounded-2xl shadow-md font-medium transition">
@@ -49,7 +48,7 @@
             </button>
             
             <h1 class="text-4xl font-bold text-blue-700">
-                🧮 SIMULATION D'UN SYMBOLE CHARIOT 🧮
+                🧮 SIMULATION D'UN SYMBOLE CHARIOT
             </h1>
             <div class="w-10"></div>
         </div>
@@ -63,12 +62,12 @@
                     <div class="grid grid-cols-2 gap-4">
                         <div>
                             <label class="block text-gray-700 mb-1 font-medium">UDI</label>
-                            <input id="udi" type="number" step="1" value="" 
+                            <input id="udi" type="number" step="1" 
                                    class="w-full bg-white border border-gray-400 rounded-2xl px-5 py-4 focus:border-emerald-600 outline-none text-lg">
                         </div>
                         <div>
                             <label class="block text-gray-700 mb-1 font-medium">Délai réappro (jours)</label>
-                            <input id="delai" type="number" step="1" value="" 
+                            <input id="delai" type="number" step="1" 
                                    class="w-full bg-white border border-gray-400 rounded-2xl px-5 py-4 focus:border-emerald-600 outline-none text-lg">
                         </div>
                     </div>
@@ -118,7 +117,7 @@
             <div id="simulation_text" class="font-mono text-sm bg-white p-6 rounded-2xl max-h-80 overflow-auto leading-relaxed text-gray-800"></div>
         </div>
 
-        <!-- COURBE AVEC TAILLE FIXE -->
+        <!-- COURBE TAILLE FIXE -->
         <div class="mt-10 bg-white border border-gray-300 p-6 rounded-3xl shadow-xl">
             <h2 class="text-xl font-semibold mb-4 text-gray-700">📈 Courbe d'évolution du stock</h2>
             <div id="stockChartContainer" class="w-full">
@@ -131,26 +130,35 @@
         </div>
     </div>
 
-    <!-- MODAL INFO (gardé) -->
+    <!-- MODAL INFO -->
     <div id="infoModal" class="hidden fixed inset-0 bg-black/70 flex items-center justify-center z-50">
         <div class="modal bg-white rounded-3xl max-w-lg w-full mx-4 shadow-2xl">
             <div class="bg-blue-600 text-white px-6 py-4 flex items-center justify-between rounded-t-3xl">
                 <h3 class="text-xl font-semibold">ℹ️ Règles de calcul</h3>
                 <button onclick="hideInfo()" class="text-3xl leading-none hover:text-gray-200">×</button>
             </div>
+            
             <div class="p-8 text-gray-700 leading-relaxed">
                 <p class="mb-4 font-medium">Simulation du symbole d’un chariot selon le standard défini :</p>
-                <ul class="space-y-3 text-sm">
+                <ul class="space-y-3 text-sm mb-6">
                     <li><strong>E = c × UDI</strong> (Pas de conditionnement coefficient unitaire)</li>
                     <li><strong>e = E × 0,4</strong></li>
                     <li><strong>e</strong> : couvre la totalité du délai de réapprovisionnement</li>
                     <li><strong>Intervalle minimum entre deux flashages = 22 jours</strong></li>
-            <div class="p-8 text-gray-700 leading-relaxed">
-                <p class="mb-4 font-medium">L’objectif est d’assurer un approvisionnement optimal, sans défaut, en évitant à la fois les surstocks et les ruptures</p> 
                 </ul>
+
+                <!-- Ligne objectif centrée en vert foncé -->
+                <p class="text-center font-bold text-emerald-800 text-lg leading-tight border-t border-gray-200 pt-6">
+                    L’objectif est d’assurer un approvisionnement optimal, sans défaut,<br>
+                    en évitant à la fois les surstocks et les ruptures.
+                </p>
             </div>
+
             <div class="p-5 border-t flex justify-center">
-                <button onclick="hideInfo()" class="bg-gray-100 hover:bg-gray-200 px-10 py-3 rounded-2xl font-medium">Fermer</button>
+                <button onclick="hideInfo()" 
+                        class="bg-gray-100 hover:bg-gray-200 px-10 py-3 rounded-2xl font-medium">
+                    Fermer
+                </button>
             </div>
         </div>
     </div>
@@ -288,27 +296,5 @@
 
         window.onload = () => {};
     </script>
-
-    <!-- MODAL INFO -->
-    <div id="infoModal" class="hidden fixed inset-0 bg-black/70 flex items-center justify-center z-50">
-        <div class="modal bg-white rounded-3xl max-w-lg w-full mx-4 shadow-2xl">
-            <div class="bg-blue-600 text-white px-6 py-4 flex items-center justify-between rounded-t-3xl">
-                <h3 class="text-xl font-semibold">ℹ️ Règles de calcul</h3>
-                <button onclick="hideInfo()" class="text-3xl leading-none hover:text-gray-200">×</button>
-            </div>
-            <div class="p-8 text-gray-700 leading-relaxed">
-                <p class="mb-4 font-medium">Simulation du symbole d’un chariot selon le standard défini :</p>
-                <ul class="space-y-3 text-sm">
-                    <li><strong>E = c × UDI</strong> (Pas de conditionnement coefficient unitaire)</li>
-                    <li><strong>e = E × 0,4</strong></li>
-                    <li><strong>e</strong> : couvre la totalité du délai de réapprovisionnement</li>
-                    <li><strong>Intervalle minimum entre deux flashages = 22 jours</strong></li>
-                </ul>
-            </div>
-            <div class="p-5 border-t flex justify-center">
-                <button onclick="hideInfo()" class="bg-gray-100 hover:bg-gray-200 px-10 py-3 rounded-2xl font-medium">Fermer</button>
-            </div>
-        </div>
-    </div>
 </body>
 </html>
