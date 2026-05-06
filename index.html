@@ -33,7 +33,7 @@
             margin: 0;
         }
         #stockChartContainer {
-            height: 260px;
+            height: 220px;
         }
     </style>
 </head>
@@ -112,7 +112,7 @@
             <div id="simulation_text" class="font-mono text-sm bg-white p-6 rounded-2xl max-h-80 overflow-auto leading-relaxed text-gray-800"></div>
         </div>
 
-        <!-- COURBE -->
+        <!-- COURBE SIMPLE (sans points verts) -->
         <div class="mt-10 bg-white border border-gray-300 p-6 rounded-3xl shadow-xl">
             <h2 class="text-xl font-semibold mb-4 text-gray-700">📈 Courbe d'évolution du stock</h2>
             <div id="stockChartContainer" class="w-full">
@@ -222,60 +222,37 @@
             return html;
         }
 
-        function dessinerCourbe(E, consoParJour, e) {
+        function dessinerCourbe(E, consoParJour) {
             const ctx = document.getElementById('stockChart');
             if (stockChart) stockChart.destroy();
 
             let stock = E;
-            const jours = [], stocks = [], launchPoints = [];
-
+            const jours = [], stocks = [];
             for (let j = 1; j <= 250; j++) {
-                if (stock <= e) {
-                    launchPoints.push({x: j, y: Math.round(stock)});
-                }
-
                 if (stock - consoParJour < consoParJour) stock += E;
                 stock -= consoParJour;
-
                 jours.push(j);
                 stocks.push(Math.round(stock));
             }
 
             stockChart = new Chart(ctx, {
                 type: 'line',
-                data: {
-                    labels: jours,
-                    datasets: [
-                        {
-                            label: 'Niveau de Stock',
-                            data: stocks,
-                            borderColor: '#e11d48',
-                            borderWidth: 3,
-                            tension: 0.4,
-                            pointRadius: 0
-                        },
-                        {
-                            label: 'Lancement de Commande',
-                            data: launchPoints,
-                            type: 'scatter',
-                            backgroundColor: '#10b981',
-                            borderColor: '#059669',
-                            pointRadius: 8,
-                            pointHoverRadius: 10,
-                            showLine: false
-                        }
-                    ]
+                data: { 
+                    labels: jours, 
+                    datasets: [{ 
+                        label: 'Niveau de Stock', 
+                        data: stocks, 
+                        borderColor: '#e11d48', 
+                        borderWidth: 3, 
+                        tension: 0.4, 
+                        pointRadius: 0 
+                    }] 
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
-                    plugins: {
-                        legend: { 
-                            display: true,
-                            position: 'top',
-                            align: 'end',
-                            labels: { font: { size: 13 }, padding: 20 }
-                        }
+                    plugins: { 
+                        legend: { display: false } 
                     },
                     scales: {
                         y: { beginAtZero: true, grid: { color: '#e5e7eb' } },
@@ -305,7 +282,7 @@
                 `Commande de ${res.E} pièces tous les ${res.Intervalle} jours (coef ${res.Coef})`;
 
             document.getElementById('simulation_text').innerHTML = genererSimulationText(res.E, keJour, res.e);
-            dessinerCourbe(res.E, keJour, res.e);
+            dessinerCourbe(res.E, keJour);
         }
 
         function showInfo() {
