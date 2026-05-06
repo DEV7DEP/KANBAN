@@ -24,15 +24,8 @@
         .result-box {
             background: linear-gradient(135deg, #1e40af, #3b82f6);
         }
-        input[type="number"] {
-            -moz-appearance: textfield;
-            appearance: textfield;
-        }
         input[type="number"]::-webkit-inner-spin-button,
-        input[type="number"]::-webkit-outer-spin-button {
-            -webkit-appearance: none;
-            margin: 0;
-        }
+        input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
         #stockChart { height: 180px !important; }
     </style>
 </head>
@@ -125,42 +118,31 @@
         }
 
         function simulerConsommation(udi, consoParJour, delai) {
-            const minInterval = 22;
-            let cibleJours = Math.max(0, Math.floor(delai) + 3);
-
-            if (consoParJour < 0.5 && udi === 1) return { E: 2, e: 1, Coef: 2, Intervalle: "--", Commentaire: "Consommation faible" };
-            if (consoParJour <= 0 || consoParJour < 0.5) {
-                let E = udi > 0 ? udi : 10;
-                let e = E < 10 ? 1 : Math.ceil(0.4 * E);
-                if (e > 10) e = Math.ceil(e / 10) * 10;
-                const coef = udi > 0 ? Math.ceil(E / udi) : 1;
-                E = coef * udi;
-                return { E: Math.round(E), e: Math.round(e), Coef: coef, Intervalle: "--", Commentaire: "Consommation faible" };
-            }
-
-            let udiEff = udi > 0 ? udi : 1;
-            let coef = Math.max(1, Math.ceil((minInterval * consoParJour) / udiEff));
-            let E = coef * udiEff;
+            let coef = 1;
+            let E = coef * udi;
             let e = Math.ceil(0.4 * E);
 
-            while (e / consoParJour < cibleJours) e += 10;
+            const cibleJours = Math.max(0, Math.floor(delai) + 3);
 
+            // Ajustement selon délai
+            while (e / consoParJour < cibleJours) {
+                e += 10;
+            }
+
+            // Correction classique
             while (e >= E) {
                 coef += 1;
-                E = coef * udiEff;
+                E = coef * udi;
             }
 
-            // === RÈGLE MODIFIÉE ===
+            // === RÈGLE DEMANDÉE ===
             if (E <= e) {
-                E = Math.ceil(e + 5 * consoParJour);   // Minimum + 5 x KE/jour
-                // On force un multiple supérieur si nécessaire
-                if (E % udi !== 0) {
-                    coef = Math.ceil(E / udi) + 1;   // +1 pour être sûr d'être plus grand
-                    E = coef * udi;
-                }
+                E = Math.ceil(e + 5 * consoParJour);   // + 5 × KE/jour
+                coef = Math.ceil(E / udi);
+                E = coef * udi;
             }
 
-            // Arrondis finaux
+            // Arrondi final
             if (E > 10) E = Math.ceil(E / 10) * 10;
             if (e > 10) e = Math.ceil(e / 10) * 10;
 
@@ -170,48 +152,8 @@
                 E: Math.round(E), 
                 e: Math.round(e), 
                 Coef: coef, 
-                Intervalle: intervalle, 
-                Commentaire: "" 
+                Intervalle: intervalle 
             };
-        }
-
-        function genererSimulationText(E, conso, commentaire) {
-            if (commentaire.includes("faible")) return "Consommation faible → pas de réappro pendant 250 jours";
-            let stock = E;
-            let html = "";
-            for (let j = 1; j <= 250; j++) {
-                if (stock - conso < conso) {
-                    stock += E;
-                    html += `<span class="text-amber-600 font-medium">Jour ${j} → COMMANDE</span> | Stock = ${Math.round(stock)}<br>`;
-                } else {
-                    stock -= conso;
-                    html += `Jour ${j} → Stock = ${Math.round(stock)}<br>`;
-                }
-            }
-            return html;
-        }
-
-        function dessinerCourbe(E, consoParJour) {
-            const ctx = document.getElementById('stockChart');
-            if (stockChart) stockChart.destroy();
-            let stock = E;
-            const jours = [], stocks = [];
-            for (let j = 1; j <= 250; j++) {
-                if (stock - consoParJour < consoParJour) stock += E;
-                stock -= consoParJour;
-                jours.push(j);
-                stocks.push(Math.round(stock));
-            }
-            stockChart = new Chart(ctx, {
-                type: 'line',
-                data: { labels: jours, datasets: [{ label: 'Stock', data: stocks, borderColor: '#e11d48', borderWidth: 3, tension: 0.4, pointRadius: 0 }] },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: { legend: { display: false } },
-                    scales: { y: { beginAtZero: true, grid: { color: '#e5e7eb' } }, x: { grid: { color: '#e5e7eb' }, ticks: { maxTicksLimit: 12 } } }
-                }
-            });
         }
 
         function lancerSimulation() {
@@ -220,7 +162,7 @@
             const delai = parseFloat(document.getElementById('delai').value) || 0;
 
             if (udi <= 0 || keJour <= 0) {
-                alert("Veuillez remplir UDI et au moins un des deux champs KE");
+                alert("Veuillez remplir UDI et au moins un champ KE");
                 return;
             }
 
@@ -230,11 +172,8 @@
             document.getElementById('e').textContent = res.e;
             document.getElementById('coef').textContent = res.Coef;
             document.getElementById('intervalle').textContent = res.Intervalle + " jours";
-            document.getElementById('commentaire').textContent = res.Commentaire || 
+            document.getElementById('commentaire').textContent = 
                 `Commande de ${res.E} pièces tous les ${res.Intervalle} jours (coef ${res.Coef})`;
-
-            document.getElementById('simulation_text').innerHTML = genererSimulationText(res.E, keJour, res.Commentaire);
-            dessinerCourbe(res.E, keJour);
         }
 
         window.onload = () => {};
