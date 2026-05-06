@@ -112,15 +112,11 @@
             <div id="simulation_text" class="font-mono text-sm bg-white p-6 rounded-2xl max-h-80 overflow-auto leading-relaxed text-gray-800"></div>
         </div>
 
-        <!-- COURBE AVEC POINTS VERTS -->
+        <!-- COURBE -->
         <div class="mt-10 bg-white border border-gray-300 p-6 rounded-3xl shadow-xl">
             <h2 class="text-xl font-semibold mb-4 text-gray-700">📈 Courbe d'évolution du stock</h2>
             <div id="stockChartContainer" class="w-full">
                 <canvas id="stockChart"></canvas>
-            </div>
-            <div class="flex justify-center gap-6 mt-3 text-sm">
-                <span class="flex items-center gap-2"><span class="inline-block w-3 h-3 bg-red-500 rounded-full"></span> Niveau de stock</span>
-                <span class="flex items-center gap-2"><span class="inline-block w-3 h-3 bg-emerald-500 rounded-full"></span> Lancement de Commande</span>
             </div>
         </div>
 
@@ -234,16 +230,12 @@
             const jours = [], stocks = [], launchPoints = [];
 
             for (let j = 1; j <= 250; j++) {
-                // Enregistrer le point vert uniquement le jour du lancement
                 if (stock <= e) {
                     launchPoints.push({x: j, y: Math.round(stock)});
                 }
 
-                if (stock - consoParJour < consoParJour) {
-                    stock += E;
-                } else {
-                    stock -= consoParJour;
-                }
+                if (stock - consoParJour < consoParJour) stock += E;
+                stock -= consoParJour;
 
                 jours.push(j);
                 stocks.push(Math.round(stock));
@@ -268,8 +260,8 @@
                             type: 'scatter',
                             backgroundColor: '#10b981',
                             borderColor: '#059669',
-                            pointRadius: 7,
-                            pointHoverRadius: 9,
+                            pointRadius: 8,
+                            pointHoverRadius: 10,
                             showLine: false
                         }
                     ]
@@ -281,7 +273,8 @@
                         legend: { 
                             display: true,
                             position: 'top',
-                            align: 'end'
+                            align: 'end',
+                            labels: { font: { size: 13 }, padding: 20 }
                         }
                     },
                     scales: {
