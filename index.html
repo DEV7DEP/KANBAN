@@ -47,7 +47,7 @@
             </button>
             
             <h1 class="text-4xl font-bold text-blue-700">
-                🧮 SIMULATION D'UN SYMBOLE CHARIOT 🧮
+                🧮 SIMULATION D'UN SYMBOLE CHARIOT
             </h1>
             <div class="w-10"></div>
         </div>
@@ -90,13 +90,26 @@
                 </button>
             </div>
 
+            <!-- RÉSULTATS MODIFIÉS -->
             <div class="result-box p-8 rounded-3xl text-white shadow-xl">
                 <h2 class="text-2xl font-semibold mb-6">📊 Résultats Simulation KE</h2>
                 <div class="grid grid-cols-2 gap-6 text-lg">
-                    <div><p class="text-white/80">E (KE)</p><p id="E" class="text-4xl font-bold">—</p></div>
-                    <div><p class="text-white/80">e (KE)</p><p id="e" class="text-4xl font-bold">—</p></div>
-                    <div><p class="text-white/80">Coef</p><p id="coef" class="text-3xl font-bold">—</p></div>
-                    <div><p class="text-white/80">Intervalle (jours)</p><p id="intervalle" class="text-3xl font-bold">—</p></div>
+                    <div>
+                        <p class="text-white/80">E</p>
+                        <p id="E" class="text-4xl font-bold text-yellow-300">—</p>
+                    </div>
+                    <div>
+                        <p class="text-white/80">e</p>
+                        <p id="e" class="text-4xl font-bold text-yellow-300">—</p>
+                    </div>
+                    <div>
+                        <p class="text-white/80">Coef</p>
+                        <p id="coef" class="text-3xl font-bold text-yellow-300">—</p>
+                    </div>
+                    <div>
+                        <p class="text-white/80">Intervalle (jours)</p>
+                        <p id="intervalle" class="text-3xl font-bold text-yellow-300">—</p>
+                    </div>
                 </div>
 
                 <div class="mt-8">
@@ -112,7 +125,7 @@
             <div id="simulation_text" class="font-mono text-sm bg-white p-6 rounded-2xl max-h-80 overflow-auto leading-relaxed text-gray-800"></div>
         </div>
 
-        <!-- COURBE SIMPLE (sans points verts) -->
+        <!-- COURBE -->
         <div class="mt-10 bg-white border border-gray-300 p-6 rounded-3xl shadow-xl">
             <h2 class="text-xl font-semibold mb-4 text-gray-700">📈 Courbe d'évolution du stock</h2>
             <div id="stockChartContainer" class="w-full">
@@ -251,9 +264,7 @@
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
-                    plugins: { 
-                        legend: { display: false } 
-                    },
+                    plugins: { legend: { display: false } },
                     scales: {
                         y: { beginAtZero: true, grid: { color: '#e5e7eb' } },
                         x: { grid: { color: '#e5e7eb' }, ticks: { maxTicksLimit: 12 } }
