@@ -24,16 +24,31 @@
         .result-box {
             background: linear-gradient(135deg, #1e40af, #3b82f6);
         }
-        input[type="number"]::-webkit-inner-spin-button,
-        input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
-        #stockChart { height: 180px !important; }
+        .modal {
+            animation: fadeIn 0.3s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.9); }
+            to { opacity: 1; transform: scale(1); }
+        }
     </style>
 </head>
 <body class="p-6">
     <div class="max-w-5xl mx-auto">
-        <h1 class="text-4xl font-bold text-center mb-10 text-blue-700">
-            🧮 SIMULATION D'UN SYMBOLE CHARIOT
-        </h1>
+        <!-- HEADER -->
+        <div class="flex justify-between items-center mb-8">
+            <button onclick="showInfo()" 
+                    class="flex items-center gap-2 bg-white hover:bg-gray-100 text-gray-700 px-5 py-3 rounded-2xl shadow-md font-medium transition">
+                <i class="fas fa-info-circle text-blue-600"></i>
+                INFO
+            </button>
+            
+            <h1 class="text-4xl font-bold text-blue-700">
+                🧮 SIMULATION D'UN SYMBOLE CHARIOT
+            </h1>
+            
+            <div class="w-10"></div> <!-- espace pour centrer le titre -->
+        </div>
 
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
             <!-- ZONE SAISIE -->
@@ -108,7 +123,33 @@
         </div>
     </div>
 
+    <!-- MODAL INFO -->
+    <div id="infoModal" class="hidden fixed inset-0 bg-black/70 flex items-center justify-center z-50">
+        <div class="modal bg-white rounded-3xl max-w-lg w-full mx-4 shadow-2xl overflow-hidden">
+            <div class="bg-blue-600 text-white px-6 py-4 flex items-center justify-between">
+                <h3 class="text-xl font-semibold">ℹ️ Information sur le calcul</h3>
+                <button onclick="hideInfo()" class="text-3xl leading-none hover:text-gray-200">×</button>
+            </div>
+            <div class="p-8 text-gray-700 leading-relaxed">
+                <p class="mb-4"><strong>Simulation du symbole d’un chariot selon le standard défini :</strong></p>
+                <ul class="space-y-3 text-sm">
+                    <li><strong>E = c × UDI</strong> (Pas de conditionnement coefficient unitaire)</li>
+                    <li><strong>e = E × 0,4</strong></li>
+                    <li><strong>e</strong> : couvre la totalité du délai de réapprovisionnement</li>
+                    <li><strong>Intervalle minimum entre deux flashages = 22 jours</strong></li>
+                </ul>
+            </div>
+            <div class="p-4 border-t text-center">
+                <button onclick="hideInfo()" 
+                        class="bg-gray-200 hover:bg-gray-300 px-8 py-3 rounded-2xl font-medium">
+                    Fermer
+                </button>
+            </div>
+        </div>
+    </div>
+
     <script>
+        // ... (tout le script précédent reste identique) ...
         let stockChart = null;
 
         function syncKE(input) {
@@ -142,7 +183,6 @@
 
             while (e / consoParJour < cibleJours) e += 10;
 
-            // Tant que e >= E, on augmente E jusqu'à e + 5*KE/jour
             while (e >= E) {
                 E = Math.ceil(e + 5 * consoParJour);
                 coef = Math.ceil(E / udi);
@@ -157,8 +197,7 @@
             return { E: Math.round(E), e: Math.round(e), Coef: coef, Intervalle: intervalle };
         }
 
-        function genererSimulationText(E, conso, commentaire) {
-            if (commentaire.includes("faible")) return "Consommation faible → pas de réappro pendant 250 jours";
+        function genererSimulationText(E, conso) {
             let stock = E;
             let html = "";
             for (let j = 1; j <= 250; j++) {
@@ -176,7 +215,6 @@
         function dessinerCourbe(E, consoParJour) {
             const ctx = document.getElementById('stockChart');
             if (stockChart) stockChart.destroy();
-
             let stock = E;
             const jours = [], stocks = [];
             for (let j = 1; j <= 250; j++) {
@@ -185,28 +223,14 @@
                 jours.push(j);
                 stocks.push(Math.round(stock));
             }
-
             stockChart = new Chart(ctx, {
                 type: 'line',
-                data: { 
-                    labels: jours, 
-                    datasets: [{ 
-                        label: 'Stock', 
-                        data: stocks, 
-                        borderColor: '#e11d48', 
-                        borderWidth: 3, 
-                        tension: 0.4, 
-                        pointRadius: 0 
-                    }] 
-                },
+                data: { labels: jours, datasets: [{ label: 'Stock', data: stocks, borderColor: '#e11d48', borderWidth: 3, tension: 0.4, pointRadius: 0 }] },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
                     plugins: { legend: { display: false } },
-                    scales: {
-                        y: { beginAtZero: true, grid: { color: '#e5e7eb' } },
-                        x: { grid: { color: '#e5e7eb' }, ticks: { maxTicksLimit: 12 } }
-                    }
+                    scales: { y: { beginAtZero: true, grid: { color: '#e5e7eb' } }, x: { grid: { color: '#e5e7eb' }, ticks: { maxTicksLimit: 12 } } }
                 }
             });
         }
@@ -230,12 +254,44 @@
             document.getElementById('commentaire').textContent = 
                 `Commande de ${res.E} pièces tous les ${res.Intervalle} jours (coef ${res.Coef})`;
 
-            // === ACTIVATION DES DEUX SECTIONS ===
-            document.getElementById('simulation_text').innerHTML = genererSimulationText(res.E, keJour, res.Commentaire || "");
+            document.getElementById('simulation_text').innerHTML = genererSimulationText(res.E, keJour);
             dessinerCourbe(res.E, keJour);
+        }
+
+        // Modal functions
+        function showInfo() {
+            document.getElementById('infoModal').classList.remove('hidden');
+        }
+        function hideInfo() {
+            document.getElementById('infoModal').classList.add('hidden');
         }
 
         window.onload = () => {};
     </script>
+
+    <!-- MODAL INFO -->
+    <div id="infoModal" class="hidden fixed inset-0 bg-black/70 flex items-center justify-center z-50">
+        <div class="modal bg-white rounded-3xl max-w-lg w-full mx-4 shadow-2xl">
+            <div class="bg-blue-600 text-white px-6 py-4 flex items-center justify-between rounded-t-3xl">
+                <h3 class="text-xl font-semibold">ℹ️ Règles de calcul</h3>
+                <button onclick="hideInfo()" class="text-3xl leading-none hover:text-gray-200">×</button>
+            </div>
+            <div class="p-8 text-gray-700 leading-relaxed">
+                <p class="mb-4 font-medium">Simulation du symbole d’un chariot selon le standard défini :</p>
+                <ul class="space-y-3 text-sm">
+                    <li><strong>E = c × UDI</strong> (Pas de conditionnement coefficient unitaire)</li>
+                    <li><strong>e = E × 0,4</strong></li>
+                    <li><strong>e</strong> : couvre la totalité du délai de réapprovisionnement</li>
+                    <li><strong>Intervalle minimum entre deux flashages = 22 jours</strong></li>
+                </ul>
+            </div>
+            <div class="p-5 border-t flex justify-center">
+                <button onclick="hideInfo()" 
+                        class="bg-gray-100 hover:bg-gray-200 px-10 py-3 rounded-2xl font-medium">
+                    Fermer
+                </button>
+            </div>
+        </div>
+    </div>
 </body>
 </html>
