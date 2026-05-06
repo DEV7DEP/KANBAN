@@ -202,14 +202,19 @@
         function genererSimulationText(E, conso, e) {
             let stock = E;
             let html = "";
+            let commandeLancee = false;
+
             for (let j = 1; j <= 250; j++) {
                 if (stock - conso < conso) {
                     stock += E;
                     html += `<span class="text-amber-600 font-medium">Jour ${j} → ALIMENTATION PAR (${E})</span> | Stock = ${Math.round(stock)}<br>`;
                 } else {
                     stock -= conso;
-                    if (stock <= e) {
+                    
+                    // Détection du jour où le stock atteint ou passe en dessous de e
+                    if (!commandeLancee && stock <= e) {
                         html += `<span class="text-red-600 font-medium">Jour ${j} → LANCEMENT DE COMMANDE</span> | Stock = ${Math.round(stock)}<br>`;
+                        commandeLancee = true;   // Une seule fois par cycle
                     } else {
                         html += `Jour ${j} → Stock = ${Math.round(stock)}<br>`;
                     }
@@ -275,7 +280,6 @@
             document.getElementById('commentaire').textContent = 
                 `Commande de ${res.E} pièces tous les ${res.Intervalle} jours (coef ${res.Coef})`;
 
-            // Mise à jour de la simulation avec e
             document.getElementById('simulation_text').innerHTML = genererSimulationText(res.E, keJour, res.e);
             dessinerCourbe(res.E, keJour);
         }
