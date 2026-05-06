@@ -106,7 +106,7 @@
             </div>
         </div>
 
-        <!-- SIMULATION 250 JOURS (inchangée) -->
+        <!-- SIMULATION 250 JOURS -->
         <div class="mt-10 simulation-box p-8 rounded-3xl shadow-xl">
             <h2 class="text-xl font-semibold mb-4 text-yellow-800">📋 Simulation détaillée sur 250 jours</h2>
             <div id="simulation_text" class="font-mono text-sm bg-white p-6 rounded-2xl max-h-80 overflow-auto leading-relaxed text-gray-800"></div>
@@ -231,15 +231,19 @@
             if (stockChart) stockChart.destroy();
 
             let stock = E;
-            const jours = [], stocks = [], launchDays = [];
+            const jours = [], stocks = [], launchPoints = [];
 
             for (let j = 1; j <= 250; j++) {
+                // Enregistrer le point vert uniquement le jour du lancement
                 if (stock <= e) {
-                    launchDays.push({x: j, y: Math.round(stock)});
+                    launchPoints.push({x: j, y: Math.round(stock)});
                 }
 
-                if (stock - consoParJour < consoParJour) stock += E;
-                stock -= consoParJour;
+                if (stock - consoParJour < consoParJour) {
+                    stock += E;
+                } else {
+                    stock -= consoParJour;
+                }
 
                 jours.push(j);
                 stocks.push(Math.round(stock));
@@ -260,12 +264,13 @@
                         },
                         {
                             label: 'Lancement de Commande',
-                            data: launchDays,
+                            data: launchPoints,
                             type: 'scatter',
                             backgroundColor: '#10b981',
-                            borderColor: '#10b981',
+                            borderColor: '#059669',
                             pointRadius: 7,
-                            pointHoverRadius: 9
+                            pointHoverRadius: 9,
+                            showLine: false
                         }
                     ]
                 },
@@ -281,7 +286,7 @@
                     },
                     scales: {
                         y: { beginAtZero: true, grid: { color: '#e5e7eb' } },
-                        x: { grid: { color: '#e5e7eb' }, ticks: { maxTicksLimit: 15 } }
+                        x: { grid: { color: '#e5e7eb' }, ticks: { maxTicksLimit: 12 } }
                     }
                 }
             });
@@ -306,10 +311,7 @@
             document.getElementById('commentaire').textContent = 
                 `Commande de ${res.E} pièces tous les ${res.Intervalle} jours (coef ${res.Coef})`;
 
-            // Simulation texte (inchangée)
             document.getElementById('simulation_text').innerHTML = genererSimulationText(res.E, keJour, res.e);
-            
-            // Courbe avec points verts
             dessinerCourbe(res.E, keJour, res.e);
         }
 
