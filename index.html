@@ -39,7 +39,6 @@
 </head>
 <body class="p-6">
     <div class="max-w-5xl mx-auto">
-        <!-- HEADER -->
         <div class="flex justify-between items-center mb-8">
             <button onclick="showInfo()" 
                     class="flex items-center gap-2 bg-white hover:bg-gray-100 text-gray-700 px-5 py-3 rounded-2xl shadow-md font-medium transition">
@@ -54,7 +53,6 @@
         </div>
 
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            <!-- ZONE SAISIE -->
             <div class="input-box p-8 rounded-3xl shadow-xl">
                 <h2 class="text-2xl font-semibold mb-6 text-emerald-800">📥 Données d'entrée</h2>
                 
@@ -62,13 +60,11 @@
                     <div class="grid grid-cols-2 gap-4">
                         <div>
                             <label class="block text-gray-700 mb-1 font-medium">UDI</label>
-                            <input id="udi" type="number" step="1" 
-                                   class="w-full bg-white border border-gray-400 rounded-2xl px-5 py-4 focus:border-emerald-600 outline-none text-lg">
+                            <input id="udi" type="number" step="1" class="w-full bg-white border border-gray-400 rounded-2xl px-5 py-4 focus:border-emerald-600 outline-none text-lg">
                         </div>
                         <div>
                             <label class="block text-gray-700 mb-1 font-medium">Délai réappro (jours)</label>
-                            <input id="delai" type="number" step="1" 
-                                   class="w-full bg-white border border-gray-400 rounded-2xl px-5 py-4 focus:border-emerald-600 outline-none text-lg">
+                            <input id="delai" type="number" step="1" class="w-full bg-white border border-gray-400 rounded-2xl px-5 py-4 focus:border-emerald-600 outline-none text-lg">
                         </div>
                     </div>
 
@@ -94,7 +90,6 @@
                 </button>
             </div>
 
-            <!-- RÉSULTATS -->
             <div class="result-box p-8 rounded-3xl text-white shadow-xl">
                 <h2 class="text-2xl font-semibold mb-6">📊 Résultats Simulation KE</h2>
                 <div class="grid grid-cols-2 gap-6 text-lg">
@@ -117,7 +112,7 @@
             <div id="simulation_text" class="font-mono text-sm bg-white p-6 rounded-2xl max-h-80 overflow-auto leading-relaxed text-gray-800"></div>
         </div>
 
-        <!-- COURBE TAILLE FIXE -->
+        <!-- COURBE -->
         <div class="mt-10 bg-white border border-gray-300 p-6 rounded-3xl shadow-xl">
             <h2 class="text-xl font-semibold mb-4 text-gray-700">📈 Courbe d'évolution du stock</h2>
             <div id="stockChartContainer" class="w-full">
@@ -137,7 +132,6 @@
                 <h3 class="text-xl font-semibold">ℹ️ Règles de calcul</h3>
                 <button onclick="hideInfo()" class="text-3xl leading-none hover:text-gray-200">×</button>
             </div>
-            
             <div class="p-8 text-gray-700 leading-relaxed">
                 <p class="mb-4 font-medium">Simulation du symbole d’un chariot selon le standard défini :</p>
                 <ul class="space-y-3 text-sm mb-6">
@@ -146,19 +140,13 @@
                     <li><strong>e</strong> : couvre la totalité du délai de réapprovisionnement</li>
                     <li><strong>Intervalle minimum entre deux flashages = 22 jours</strong></li>
                 </ul>
-
-                <!-- Ligne objectif centrée en vert foncé -->
                 <p class="text-center font-bold text-emerald-800 text-lg leading-tight border-t border-gray-200 pt-6">
                     L’objectif est d’assurer un approvisionnement optimal, sans défaut,<br>
                     en évitant à la fois les surstocks et les ruptures.
                 </p>
             </div>
-
             <div class="p-5 border-t flex justify-center">
-                <button onclick="hideInfo()" 
-                        class="bg-gray-100 hover:bg-gray-200 px-10 py-3 rounded-2xl font-medium">
-                    Fermer
-                </button>
+                <button onclick="hideInfo()" class="bg-gray-100 hover:bg-gray-200 px-10 py-3 rounded-2xl font-medium">Fermer</button>
             </div>
         </div>
     </div>
@@ -217,7 +205,7 @@
             for (let j = 1; j <= 250; j++) {
                 if (stock - conso < conso) {
                     stock += E;
-                    html += `<span class="text-amber-600 font-medium">Jour ${j} → COMMANDE</span> | Stock = ${Math.round(stock)}<br>`;
+                    html += `<span class="text-amber-600 font-medium">Jour ${j} → ALIMENTATION PAR (${E})</span> | Stock = ${Math.round(stock)}<br>`;
                 } else {
                     stock -= conso;
                     html += `Jour ${j} → Stock = ${Math.round(stock)}<br>`;
