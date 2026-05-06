@@ -128,7 +128,6 @@
             const minInterval = 22;
             let cibleJours = Math.max(0, Math.floor(delai) + 3);
 
-            // Cas particuliers
             if (consoParJour < 0.5 && udi === 1) return { E: 2, e: 1, Coef: 2, Intervalle: "--", Commentaire: "Consommation faible" };
             if (consoParJour <= 0 || consoParJour < 0.5) {
                 let E = udi > 0 ? udi : 10;
@@ -144,22 +143,21 @@
             let E = coef * udiEff;
             let e = Math.ceil(0.4 * E);
 
-            // Ajustement délai
             while (e / consoParJour < cibleJours) e += 10;
 
-            // Correction classique e >= E
             while (e >= E) {
-                coef++;
+                coef += 1;
                 E = coef * udiEff;
             }
 
-            // === NOUVELLE RÈGLE DEMANDÉE ===
-            // Si E <= e → E doit être au minimum e + 5 × KE/jour
+            // === RÈGLE MODIFIÉE ===
             if (E <= e) {
-                E = Math.ceil(e + 5 * consoParJour);
-                // On remet E comme multiple de UDI
-                coef = Math.ceil(E / udi);
-                E = coef * udi;
+                E = Math.ceil(e + 5 * consoParJour);   // Minimum + 5 x KE/jour
+                // On force un multiple supérieur si nécessaire
+                if (E % udi !== 0) {
+                    coef = Math.ceil(E / udi) + 1;   // +1 pour être sûr d'être plus grand
+                    E = coef * udi;
+                }
             }
 
             // Arrondis finaux
@@ -177,7 +175,6 @@
             };
         }
 
-        // Le reste du code reste identique
         function genererSimulationText(E, conso, commentaire) {
             if (commentaire.includes("faible")) return "Consommation faible → pas de réappro pendant 250 jours";
             let stock = E;
