@@ -24,27 +24,18 @@
         .result-box {
             background: linear-gradient(135deg, #1e40af, #3b82f6);
         }
-        input[type="number"] {
-            -moz-appearance: textfield;
-            appearance: textfield;
-        }
         input[type="number"]::-webkit-inner-spin-button,
-        input[type="number"]::-webkit-outer-spin-button {
-            -webkit-appearance: none;
-            margin: 0;
-        }
+        input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
         #stockChart { height: 180px !important; }
     </style>
 </head>
 <body class="p-6">
     <div class="max-w-5xl mx-auto">
-        <!-- TITRE EXACT DEMANDÉ -->
         <h1 class="text-4xl font-bold text-center mb-10 text-blue-700">
-            🧮 SIMULATION D'UN SYMBOLE CHARIOT 🧮
+            🧮 SIMULATION D'UN SYMBOLE CHARIOT
         </h1>
 
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            <!-- ZONE SAISIE -->
             <div class="input-box p-8 rounded-3xl shadow-xl">
                 <h2 class="text-2xl font-semibold mb-6 text-emerald-800">📥 Données d'entrée</h2>
                 
@@ -52,13 +43,11 @@
                     <div class="grid grid-cols-2 gap-4">
                         <div>
                             <label class="block text-gray-700 mb-1 font-medium">UDI</label>
-                            <input id="udi" type="number" step="0.01" 
-                                   class="w-full bg-white border border-gray-400 rounded-2xl px-5 py-4 focus:border-emerald-600 outline-none text-lg">
+                            <input id="udi" type="number" step="0.01" class="w-full bg-white border border-gray-400 rounded-2xl px-5 py-4 focus:border-emerald-600 outline-none text-lg">
                         </div>
                         <div>
                             <label class="block text-gray-700 mb-1 font-medium">Délai réappro (jours)</label>
-                            <input id="delai" type="number" 
-                                   class="w-full bg-white border border-gray-400 rounded-2xl px-5 py-4 focus:border-emerald-600 outline-none text-lg">
+                            <input id="delai" type="number" class="w-full bg-white border border-gray-400 rounded-2xl px-5 py-4 focus:border-emerald-600 outline-none text-lg">
                         </div>
                     </div>
 
@@ -84,27 +73,13 @@
                 </button>
             </div>
 
-            <!-- RÉSULTATS -->
             <div class="result-box p-8 rounded-3xl text-white shadow-xl">
                 <h2 class="text-2xl font-semibold mb-6">📊 Résultats Simulation KE</h2>
-                
                 <div class="grid grid-cols-2 gap-6 text-lg">
-                    <div>
-                        <p class="text-white/80">E (KE)</p>
-                        <p id="E" class="text-4xl font-bold">—</p>
-                    </div>
-                    <div>
-                        <p class="text-white/80">e (KE)</p>
-                        <p id="e" class="text-4xl font-bold">—</p>
-                    </div>
-                    <div>
-                        <p class="text-white/80">Coef</p>
-                        <p id="coef" class="text-3xl font-bold">—</p>
-                    </div>
-                    <div>
-                        <p class="text-white/80">Intervalle (jours)</p>
-                        <p id="intervalle" class="text-3xl font-bold">—</p>
-                    </div>
+                    <div><p class="text-white/80">E (KE)</p><p id="E" class="text-4xl font-bold">—</p></div>
+                    <div><p class="text-white/80">e (KE)</p><p id="e" class="text-4xl font-bold">—</p></div>
+                    <div><p class="text-white/80">Coef</p><p id="coef" class="text-3xl font-bold">—</p></div>
+                    <div><p class="text-white/80">Intervalle (jours)</p><p id="intervalle" class="text-3xl font-bold">—</p></div>
                 </div>
 
                 <div class="mt-8">
@@ -114,13 +89,11 @@
             </div>
         </div>
 
-        <!-- SIMULATION 250 JOURS -->
         <div class="mt-10 simulation-box p-8 rounded-3xl shadow-xl">
             <h2 class="text-xl font-semibold mb-4 text-yellow-800">📋 Simulation détaillée sur 250 jours</h2>
             <div id="simulation_text" class="font-mono text-sm bg-white p-6 rounded-2xl max-h-80 overflow-auto leading-relaxed text-gray-800"></div>
         </div>
 
-        <!-- COURBE -->
         <div class="mt-10 bg-white border border-gray-300 p-6 rounded-3xl shadow-xl">
             <h2 class="text-xl font-semibold mb-4 text-gray-700">📈 Courbe d'évolution du stock</h2>
             <canvas id="stockChart" class="w-full"></canvas>
@@ -163,65 +136,28 @@
             let E = coef * udiEff;
             let e = Math.ceil(0.4 * E);
 
+            // Ajustement délai (on ne touche pas e après)
             while (e / consoParJour < cibleJours) e += 10;
-            while (e >= E) { coef++; E = coef * udiEff; }
 
+            // Tant que e >= E, on augmente E jusqu'à e + 5*KE
+            while (e >= E) {
+                E = Math.ceil(e + 5 * consoParJour);
+                coef = Math.ceil(E / udi);
+                E = coef * udi;
+            }
+
+            // Arrondis finaux
             if (E > 10) E = Math.ceil(E / 10) * 10;
             if (e > 10) e = Math.ceil(e / 10) * 10;
-            if (e >= E) E += 10;
 
-            coef = udi > 0 ? Math.ceil(E / udi) : 1;
-            E = coef * udi;
             const intervalle = Math.round(E / consoParJour);
 
-            return { E: Math.round(E), e: Math.round(e), Coef: coef, Intervalle: intervalle, Commentaire: "" };
-        }
-
-        function genererSimulationText(E, conso, commentaire) {
-            if (commentaire.includes("faible")) return "Consommation faible → pas de réappro pendant 250 jours";
-            let stock = E;
-            let html = "";
-            for (let j = 1; j <= 250; j++) {
-                if (stock - conso < conso) {
-                    stock += E;
-                    html += `<span class="text-amber-600 font-medium">Jour ${j} → COMMANDE</span> | Stock = ${Math.round(stock)}<br>`;
-                } else {
-                    stock -= conso;
-                    html += `Jour ${j} → Stock = ${Math.round(stock)}<br>`;
-                }
-            }
-            return html;
-        }
-
-        function dessinerCourbe(E, consoParJour) {
-            const ctx = document.getElementById('stockChart');
-            if (stockChart) stockChart.destroy();
-
-            let stock = E;
-            const jours = [], stocks = [];
-            for (let j = 1; j <= 250; j++) {
-                if (stock - consoParJour < consoParJour) stock += E;
-                stock -= consoParJour;
-                jours.push(j);
-                stocks.push(Math.round(stock));
-            }
-
-            stockChart = new Chart(ctx, {
-                type: 'line',
-                data: { 
-                    labels: jours, 
-                    datasets: [{ label: 'Stock', data: stocks, borderColor: '#e11d48', borderWidth: 3, tension: 0.4, pointRadius: 0 }] 
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: { legend: { display: false } },
-                    scales: {
-                        y: { beginAtZero: true, grid: { color: '#e5e7eb' } },
-                        x: { grid: { color: '#e5e7eb' }, ticks: { maxTicksLimit: 12 } }
-                    }
-                }
-            });
+            return { 
+                E: Math.round(E), 
+                e: Math.round(e), 
+                Coef: coef, 
+                Intervalle: intervalle 
+            };
         }
 
         function lancerSimulation() {
@@ -230,7 +166,7 @@
             const delai = parseFloat(document.getElementById('delai').value) || 0;
 
             if (udi <= 0 || keJour <= 0) {
-                alert("Veuillez remplir UDI et au moins un des deux champs KE");
+                alert("Veuillez remplir UDI et au moins un champ KE");
                 return;
             }
 
@@ -240,11 +176,8 @@
             document.getElementById('e').textContent = res.e;
             document.getElementById('coef').textContent = res.Coef;
             document.getElementById('intervalle').textContent = res.Intervalle + " jours";
-            document.getElementById('commentaire').textContent = res.Commentaire || 
+            document.getElementById('commentaire').textContent = 
                 `Commande de ${res.E} pièces tous les ${res.Intervalle} jours (coef ${res.Coef})`;
-
-            document.getElementById('simulation_text').innerHTML = genererSimulationText(res.E, keJour, res.Commentaire);
-            dessinerCourbe(res.E, keJour);
         }
 
         window.onload = () => {};
