@@ -199,7 +199,7 @@
             return { E: Math.round(E), e: Math.round(e), Coef: coef, Intervalle: intervalle };
         }
 
-        function genererSimulationText(E, conso) {
+        function genererSimulationText(E, conso, e) {
             let stock = E;
             let html = "";
             for (let j = 1; j <= 250; j++) {
@@ -208,7 +208,11 @@
                     html += `<span class="text-amber-600 font-medium">Jour ${j} → ALIMENTATION PAR (${E})</span> | Stock = ${Math.round(stock)}<br>`;
                 } else {
                     stock -= conso;
-                    html += `Jour ${j} → Stock = ${Math.round(stock)}<br>`;
+                    if (stock <= e) {
+                        html += `<span class="text-red-600 font-medium">Jour ${j} → LANCEMENT DE COMMANDE</span> | Stock = ${Math.round(stock)}<br>`;
+                    } else {
+                        html += `Jour ${j} → Stock = ${Math.round(stock)}<br>`;
+                    }
                 }
             }
             return html;
@@ -271,7 +275,8 @@
             document.getElementById('commentaire').textContent = 
                 `Commande de ${res.E} pièces tous les ${res.Intervalle} jours (coef ${res.Coef})`;
 
-            document.getElementById('simulation_text').innerHTML = genererSimulationText(res.E, keJour);
+            // Mise à jour de la simulation avec e
+            document.getElementById('simulation_text').innerHTML = genererSimulationText(res.E, keJour, res.e);
             dessinerCourbe(res.E, keJour);
         }
 
