@@ -36,6 +36,7 @@
         </h1>
 
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <!-- ZONE SAISIE -->
             <div class="input-box p-8 rounded-3xl shadow-xl">
                 <h2 class="text-2xl font-semibold mb-6 text-emerald-800">📥 Données d'entrée</h2>
                 
@@ -73,6 +74,7 @@
                 </button>
             </div>
 
+            <!-- RÉSULTATS -->
             <div class="result-box p-8 rounded-3xl text-white shadow-xl">
                 <h2 class="text-2xl font-semibold mb-6">📊 Résultats Simulation KE</h2>
                 <div class="grid grid-cols-2 gap-6 text-lg">
@@ -89,11 +91,13 @@
             </div>
         </div>
 
+        <!-- SIMULATION 250 JOURS -->
         <div class="mt-10 simulation-box p-8 rounded-3xl shadow-xl">
             <h2 class="text-xl font-semibold mb-4 text-yellow-800">📋 Simulation détaillée sur 250 jours</h2>
             <div id="simulation_text" class="font-mono text-sm bg-white p-6 rounded-2xl max-h-80 overflow-auto leading-relaxed text-gray-800"></div>
         </div>
 
+        <!-- COURBE -->
         <div class="mt-10 bg-white border border-gray-300 p-6 rounded-3xl shadow-xl">
             <h2 class="text-xl font-semibold mb-4 text-gray-700">📈 Courbe d'évolution du stock</h2>
             <canvas id="stockChart" class="w-full"></canvas>
@@ -136,28 +140,75 @@
             let E = coef * udiEff;
             let e = Math.ceil(0.4 * E);
 
-            // Ajustement délai (on ne touche pas e après)
             while (e / consoParJour < cibleJours) e += 10;
 
-            // Tant que e >= E, on augmente E jusqu'à e + 5*KE
+            // Tant que e >= E, on augmente E jusqu'à e + 5*KE/jour
             while (e >= E) {
                 E = Math.ceil(e + 5 * consoParJour);
                 coef = Math.ceil(E / udi);
                 E = coef * udi;
             }
 
-            // Arrondis finaux
             if (E > 10) E = Math.ceil(E / 10) * 10;
             if (e > 10) e = Math.ceil(e / 10) * 10;
 
             const intervalle = Math.round(E / consoParJour);
 
-            return { 
-                E: Math.round(E), 
-                e: Math.round(e), 
-                Coef: coef, 
-                Intervalle: intervalle 
-            };
+            return { E: Math.round(E), e: Math.round(e), Coef: coef, Intervalle: intervalle };
+        }
+
+        function genererSimulationText(E, conso, commentaire) {
+            if (commentaire.includes("faible")) return "Consommation faible → pas de réappro pendant 250 jours";
+            let stock = E;
+            let html = "";
+            for (let j = 1; j <= 250; j++) {
+                if (stock - conso < conso) {
+                    stock += E;
+                    html += `<span class="text-amber-600 font-medium">Jour ${j} → COMMANDE</span> | Stock = ${Math.round(stock)}<br>`;
+                } else {
+                    stock -= conso;
+                    html += `Jour ${j} → Stock = ${Math.round(stock)}<br>`;
+                }
+            }
+            return html;
+        }
+
+        function dessinerCourbe(E, consoParJour) {
+            const ctx = document.getElementById('stockChart');
+            if (stockChart) stockChart.destroy();
+
+            let stock = E;
+            const jours = [], stocks = [];
+            for (let j = 1; j <= 250; j++) {
+                if (stock - consoParJour < consoParJour) stock += E;
+                stock -= consoParJour;
+                jours.push(j);
+                stocks.push(Math.round(stock));
+            }
+
+            stockChart = new Chart(ctx, {
+                type: 'line',
+                data: { 
+                    labels: jours, 
+                    datasets: [{ 
+                        label: 'Stock', 
+                        data: stocks, 
+                        borderColor: '#e11d48', 
+                        borderWidth: 3, 
+                        tension: 0.4, 
+                        pointRadius: 0 
+                    }] 
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        y: { beginAtZero: true, grid: { color: '#e5e7eb' } },
+                        x: { grid: { color: '#e5e7eb' }, ticks: { maxTicksLimit: 12 } }
+                    }
+                }
+            });
         }
 
         function lancerSimulation() {
@@ -178,6 +229,10 @@
             document.getElementById('intervalle').textContent = res.Intervalle + " jours";
             document.getElementById('commentaire').textContent = 
                 `Commande de ${res.E} pièces tous les ${res.Intervalle} jours (coef ${res.Coef})`;
+
+            // === ACTIVATION DES DEUX SECTIONS ===
+            document.getElementById('simulation_text').innerHTML = genererSimulationText(res.E, keJour, res.Commentaire || "");
+            dessinerCourbe(res.E, keJour);
         }
 
         window.onload = () => {};
