@@ -124,41 +124,34 @@
 
             const cibleJours = Math.max(0, Math.floor(delai) + 3);
 
-            // Ajustement délai
             while (e / consoParJour < cibleJours) e += 10;
 
-            // Correction classique
             while (e >= E) {
                 coef += 1;
                 E = coef * udi;
             }
 
-            // === RÈGLE PRINCIPALE DEMANDÉE ===
+            // RÈGLE STRICTE : E doit être PLUS GRAND que e
             if (E <= e) {
-                E = Math.ceil(e + 5 * consoParJour);   // E minimum = e + 5 × KE/jour
+                E = Math.ceil(e + 5 * consoParJour);     // Minimum e + 5*KE
                 coef = Math.ceil(E / udi);
                 E = coef * udi;
             }
 
-            // Contrôle final strict
+            // Contrôle final très strict (E > e)
             if (E <= e) {
-                E = Math.ceil(e + 5 * consoParJour);
+                E = Math.ceil(e + 5 * consoParJour) + udi;   // On ajoute au moins 1 UDI pour être sûr
                 coef = Math.ceil(E / udi);
                 E = coef * udi;
             }
 
-            // Arrondis finaux
+            // Arrondis
             if (E > 10) E = Math.ceil(E / 10) * 10;
             if (e > 10) e = Math.ceil(e / 10) * 10;
 
             const intervalle = Math.round(E / consoParJour);
 
-            return { 
-                E: Math.round(E), 
-                e: Math.round(e), 
-                Coef: coef, 
-                Intervalle: intervalle 
-            };
+            return { E: Math.round(E), e: Math.round(e), Coef: coef, Intervalle: intervalle };
         }
 
         function lancerSimulation() {
