@@ -202,15 +202,19 @@
         function genererSimulationText(E, conso, e) {
             let stock = E;
             let html = "";
+            let lancementAffiche = false;
+
             for (let j = 1; j <= 250; j++) {
                 // Vérification avant consommation
-                if (stock <= e) {
+                if (stock <= e && !lancementAffiche) {
                     html += `<span class="text-red-600 font-medium">Jour ${j} → LANCEMENT DE COMMANDE</span> | Stock = ${Math.round(stock)}<br>`;
+                    lancementAffiche = true;
                 }
 
                 if (stock - conso < conso) {
                     stock += E;
                     html += `<span class="text-amber-600 font-medium">Jour ${j} → ALIMENTATION PAR (${E})</span> | Stock = ${Math.round(stock)}<br>`;
+                    lancementAffiche = false;   // Réinitialisation pour le prochain cycle
                 } else {
                     stock -= conso;
                     html += `Jour ${j} → Stock = ${Math.round(stock)}<br>`;
